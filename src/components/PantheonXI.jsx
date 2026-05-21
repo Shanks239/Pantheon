@@ -95,7 +95,7 @@ function VideoBackground() {
     <div style={{position:"fixed",inset:0,zIndex:0,pointerEvents:"none",overflow:"hidden"}}>
       {/* Replace this div with a <video> tag pointing to /videos/stadium.mp4 */}
       <video
-        autoPlay muted loop playsInline
+        autoPlay muted loop playsInline preload="auto"
         style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",opacity:0.18}}
       >
         <source src="/videos/stadium.mp4" type="video/mp4"/>
@@ -240,8 +240,8 @@ export default function Pantheon() {
         <div style={{
           fontFamily:"'Cormorant Garamond',Georgia,serif",
           fontWeight:700,
-          fontSize:"clamp(48px,16vw,96px)",
-          letterSpacing:"0.3em",
+          fontSize:"clamp(28px,10vw,96px)",
+          letterSpacing:"0.15em",
           background:"linear-gradient(90deg,#8B6914,#D4A843,#F0C96A,#F5E09A,#D4A843,#8B6914)",
           backgroundSize:"200% auto",
           WebkitBackgroundClip:"text",
@@ -249,7 +249,7 @@ export default function Pantheon() {
           backgroundClip:"text",
           animation:"fadeUp 1s 0.5s both, goldShimmer 5s linear 1.5s infinite",
           lineHeight:1,
-          paddingRight:"0.3em",
+          paddingRight:"0.15em",
         }}>PANTHEON</div>
 
         <div style={{
