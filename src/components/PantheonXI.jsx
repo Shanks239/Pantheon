@@ -177,6 +177,8 @@ export default function Pantheon() {
   const [consensus, setConsensus] = useState(null);
   const [minted, setMinted] = useState(false);
   const bottomRef = useRef(null);
+  const [openCats, setOpenCats] = useState({"immortals":true,"contenders":false,"heirs":false});
+  const toggleCat = (id) => setOpenCats(p=>({...p,[id]:!p[id]}));
 
   useEffect(()=>{
     const link = document.createElement("link");
@@ -321,38 +323,55 @@ export default function Pantheon() {
         <h1 style={S.h1}>Choose Three Legends</h1>
         <p style={S.sub}>They will not agree. That is the point.</p>
 
-        {CATEGORIES.map(cat=>(
-          <div key={cat.id} style={{marginBottom:28}}>
-            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
-              <div style={{fontFamily:"'Cormorant Garamond',Georgia,serif",fontSize:11,letterSpacing:"0.25em",color:"rgba(212,168,67,0.7)",textTransform:"uppercase"}}>{cat.label}</div>
-              <div style={{flex:1,height:"0.5px",background:"rgba(212,168,67,0.15)"}}/>
-              <div style={{fontFamily:"'Crimson Text',Georgia,serif",fontSize:10,color:"rgba(245,237,216,0.25)",fontStyle:"italic"}}>{cat.desc}</div>
+        {CATEGORIES.map(cat=>{
+          const isOpen = openCats[cat.id];
+          const catSelected = LEGENDS.filter(l=>l.cat===cat.id&&selected.includes(l.id)).length;
+          return (
+            <div key={cat.id} style={{marginBottom:16}}>
+              {/* Category header — tap to collapse/expand */}
+              <div
+                onClick={()=>toggleCat(cat.id)}
+                style={{display:"flex",alignItems:"center",gap:10,marginBottom:isOpen?12:0,cursor:"pointer",padding:"8px 0",userSelect:"none"}}
+              >
+                <div style={{fontFamily:"'Cormorant Garamond',Georgia,serif",fontSize:11,letterSpacing:"0.25em",color:isOpen?"rgba(212,168,67,0.9)":"rgba(212,168,67,0.5)",textTransform:"uppercase",transition:"color 0.2s"}}>{cat.label}</div>
+                {catSelected>0&&(
+                  <span style={{fontFamily:"'Crimson Text',Georgia,serif",fontSize:10,color:"#D4A843",background:"rgba(212,168,67,0.15)",border:"0.5px solid rgba(212,168,67,0.4)",borderRadius:10,padding:"1px 7px"}}>{catSelected}</span>
+                )}
+                <div style={{flex:1,height:"0.5px",background:"rgba(212,168,67,0.15)"}}/>
+                <div style={{fontFamily:"'Crimson Text',Georgia,serif",fontSize:10,color:"rgba(245,237,216,0.2)",fontStyle:"italic",display:"flex",alignItems:"center",gap:6}}>
+                  {!isOpen&&<span style={{fontSize:9,color:"rgba(245,237,216,0.2)"}}>{cat.desc}</span>}
+                  <span style={{fontSize:14,color:"rgba(212,168,67,0.4)",transition:"transform 0.2s",display:"inline-block",transform:isOpen?"rotate(180deg)":"rotate(0deg)"}}>⌄</span>
+                </div>
+              </div>
+              {/* Collapsible grid */}
+              {isOpen&&(
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,animation:"fadeUp 0.25s ease both"}}>
+                  {LEGENDS.filter(l=>l.cat===cat.id).map(lg=>{
+                    const isSel=selected.includes(lg.id);
+                    const idx=selected.indexOf(lg.id);
+                    const isLocked=!isSel&&selected.length>=3;
+                    return (
+                      <div key={lg.id}
+                        className={`ph-legend-card ${isSel?"sel":""} ${isLocked?"locked":""}`}
+                        onClick={()=>toggle(lg.id)}
+                      >
+                        <div style={{position:"absolute",top:6,left:6,width:8,height:8,borderTop:`1px solid rgba(212,168,67,${isSel?0.7:0.25})`,borderLeft:`1px solid rgba(212,168,67,${isSel?0.7:0.25})`}}/>
+                        <div style={{position:"absolute",bottom:6,right:6,width:8,height:8,borderBottom:`1px solid rgba(212,168,67,${isSel?0.7:0.25})`,borderRight:`1px solid rgba(212,168,67,${isSel?0.7:0.25})`}}/>
+                        <div style={{fontSize:22,marginBottom:8}}>{lg.flag}</div>
+                        <div style={{fontFamily:"'Cormorant Garamond',Georgia,serif",fontSize:14,fontWeight:700,color:isSel?"#D4A843":"#F5EDD8",lineHeight:1.2,marginBottom:5}}>{lg.name}</div>
+                        <div style={{fontFamily:"'Crimson Text',Georgia,serif",fontSize:11,color:"rgba(245,237,216,0.45)",marginBottom:2}}>{lg.trophy}</div>
+                        <div style={{fontFamily:"'Crimson Text',Georgia,serif",fontSize:10,color:"rgba(245,237,216,0.25)"}}>{lg.era}</div>
+                        {isSel&&(
+                          <div style={{position:"absolute",top:8,right:10,fontFamily:"'Cormorant Garamond',Georgia,serif",fontSize:13,fontWeight:700,color:"#D4A843",letterSpacing:"0.05em"}}>{ROMAN[idx]}</div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-              {LEGENDS.filter(l=>l.cat===cat.id).map(lg=>{
-                const isSel=selected.includes(lg.id);
-                const idx=selected.indexOf(lg.id);
-                const isLocked=!isSel&&selected.length>=3;
-                return (
-                  <div key={lg.id}
-                    className={`ph-legend-card ${isSel?"sel":""} ${isLocked?"locked":""}`}
-                    onClick={()=>toggle(lg.id)}
-                  >
-                    <div style={{position:"absolute",top:6,left:6,width:8,height:8,borderTop:`1px solid rgba(212,168,67,${isSel?0.7:0.25})`,borderLeft:`1px solid rgba(212,168,67,${isSel?0.7:0.25})`}}/>
-                    <div style={{position:"absolute",bottom:6,right:6,width:8,height:8,borderBottom:`1px solid rgba(212,168,67,${isSel?0.7:0.25})`,borderRight:`1px solid rgba(212,168,67,${isSel?0.7:0.25})`}}/>
-                    <div style={{fontSize:22,marginBottom:8}}>{lg.flag}</div>
-                    <div style={{fontFamily:"'Cormorant Garamond',Georgia,serif",fontSize:14,fontWeight:700,color:isSel?"#D4A843":"#F5EDD8",lineHeight:1.2,marginBottom:5}}>{lg.name}</div>
-                    <div style={{fontFamily:"'Crimson Text',Georgia,serif",fontSize:11,color:"rgba(245,237,216,0.45)",marginBottom:2}}>{lg.trophy}</div>
-                    <div style={{fontFamily:"'Crimson Text',Georgia,serif",fontSize:10,color:"rgba(245,237,216,0.25)"}}>{lg.era}</div>
-                    {isSel&&(
-                      <div style={{position:"absolute",top:8,right:10,fontFamily:"'Cormorant Garamond',Georgia,serif",fontSize:13,fontWeight:700,color:"#D4A843",letterSpacing:"0.05em"}}>{ROMAN[idx]}</div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+          );
+        })}
 
         <Ornament dim/>
         <div style={{display:"flex",gap:8,flexWrap:"wrap",minHeight:26,marginBottom:22}}>
