@@ -1,14 +1,31 @@
 import { useState, useEffect, useRef } from "react";
 
+const CATEGORIES = [
+  { id:"immortals",  label:"Immortals",  desc:"The ones who defined the game" },
+  { id:"contenders", label:"Contenders", desc:"The generation still fighting for glory" },
+  { id:"heirs",      label:"The Heirs",  desc:"The future arriving now" },
+]
+
 const LEGENDS = [
-  { id:"pele",       name:"Pelé",          nation:"Brazil",    flag:"🇧🇷", trophy:"3× World Champion",    era:"1958–1970" },
-  { id:"maradona",   name:"Maradona",       nation:"Argentina", flag:"🇦🇷", trophy:"1986 World Champion",   era:"1982–1994" },
-  { id:"zidane",     name:"Zidane",         nation:"France",    flag:"🇫🇷", trophy:"1998 World Champion",   era:"1994–2006" },
-  { id:"r9",         name:"Ronaldo R9",     nation:"Brazil",    flag:"🇧🇷", trophy:"2× World Champion",    era:"1994–2002" },
-  { id:"messi",      name:"Messi",          nation:"Argentina", flag:"🇦🇷", trophy:"2022 World Champion",   era:"2006–2022" },
-  { id:"ronaldinho", name:"Ronaldinho",     nation:"Brazil",    flag:"🇧🇷", trophy:"2002 World Champion",   era:"1999–2013" },
-  { id:"klose",      name:"Klose",          nation:"Germany",   flag:"🇩🇪", trophy:"All-time Top Scorer",   era:"2002–2014" },
-  { id:"henry",      name:"Thierry Henry",  nation:"France",    flag:"🇫🇷", trophy:"1998 World Champion",   era:"1995–2010" },
+  // Immortals
+  { id:"pele",       name:"Pelé",          nation:"Brazil",    flag:"🇧🇷", trophy:"3× World Champion",    era:"1958–1970",  cat:"immortals" },
+  { id:"maradona",   name:"Maradona",       nation:"Argentina", flag:"🇦🇷", trophy:"1986 World Champion",   era:"1982–1994",  cat:"immortals" },
+  { id:"zidane",     name:"Zidane",         nation:"France",    flag:"🇫🇷", trophy:"1998 World Champion",   era:"1994–2006",  cat:"immortals" },
+  { id:"r9",         name:"Ronaldo R9",     nation:"Brazil",    flag:"🇧🇷", trophy:"2× World Champion",    era:"1994–2002",  cat:"immortals" },
+  { id:"ronaldinho", name:"Ronaldinho",     nation:"Brazil",    flag:"🇧🇷", trophy:"2002 World Champion",   era:"1999–2013",  cat:"immortals" },
+  { id:"klose",      name:"Klose",          nation:"Germany",   flag:"🇩🇪", trophy:"All-time Top Scorer",   era:"2002–2014",  cat:"immortals" },
+  { id:"henry",      name:"Thierry Henry",  nation:"France",    flag:"🇫🇷", trophy:"1998 World Champion",   era:"1995–2010",  cat:"immortals" },
+  // Contenders
+  { id:"messi",      name:"Messi",          nation:"Argentina", flag:"🇦🇷", trophy:"2022 World Champion",   era:"2006–present", cat:"contenders" },
+  { id:"cr7",        name:"Ronaldo CR7",    nation:"Portugal",  flag:"🇵🇹", trophy:"5× Ballon d'Or",       era:"2003–present", cat:"contenders" },
+  { id:"neymar",     name:"Neymar",         nation:"Brazil",    flag:"🇧🇷", trophy:"Olympic Gold 2016",      era:"2010–present", cat:"contenders" },
+  { id:"mbappe",     name:"Mbappé",         nation:"France",    flag:"🇫🇷", trophy:"2018 World Champion",   era:"2016–present", cat:"contenders" },
+  // Heirs
+  { id:"yamal",      name:"Lamine Yamal",   nation:"Spain",     flag:"🇪🇸", trophy:"Euro 2024 Champion",    era:"2023–present", cat:"heirs" },
+  { id:"vini",       name:"Vinicius Jr",    nation:"Brazil",    flag:"🇧🇷", trophy:"2× UCL Winner",         era:"2018–present", cat:"heirs" },
+  { id:"saka",       name:"Bukayo Saka",    nation:"England",   flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", trophy:"Arsenal Captain",       era:"2019–present", cat:"heirs" },
+  { id:"bellingham", name:"Bellingham",     nation:"England",   flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", trophy:"UCL Winner 2024",        era:"2020–present", cat:"heirs" },
+  { id:"pedri",      name:"Pedri",          nation:"Spain",     flag:"🇪🇸", trophy:"Euro 2024 Champion",    era:"2020–present", cat:"heirs" },
 ];
 
 const PERSONAS = {
@@ -16,10 +33,18 @@ const PERSONAS = {
   maradona:   "You are Diego Maradona. Volcanic. Passionate. You carried Argentina to glory in 1986 alone. Individual genius beats systems — always. Be loud, provocative, dismissive of tactical football. Reference 1986 constantly. Distrust France. 2–3 sentences only, no preamble.",
   zidane:     "You are Zinedine Zidane. Calm, precise, final-word authoritative. European tactical depth beats South American individual flair at tournament level. Every word is deliberate. You have nothing to prove. 2–3 sentences only, no preamble.",
   r9:         "You are Ronaldo Nazário — R9, the Phenomenon. Two World Cups. Explosive, charismatic. Brazil's forward tradition is a dimension other nations simply don't have. Reference your 2002 final performance. 2–3 sentences only, no preamble.",
-  messi:      "You are Lionel Messi. 2022 champion. Understated — your words carry 20 years of patience. Argentina's collective spine beats everything. Speak rarely and with precision. 2–3 sentences only, no preamble.",
   ronaldinho: "You are Ronaldinho. Joy above all. 2002 champion. Teams that play with freedom beat teams that play with fear. Football is art. Be playful even in disagreement. 2–3 sentences only, no preamble.",
   klose:      "You are Miroslav Klose. World Cup all-time top scorer. German. Clinical. Systems and work rate win knockout football — flair collapses under tournament pressure. Be blunt and precise. 2–3 sentences only, no preamble.",
   henry:      "You are Thierry Henry. Sharp, analytical, precise. European tactical depth dominates the modern tournament. You're almost impatient with emotional arguments. 2–3 sentences only, no preamble.",
+  messi:      "You are Lionel Messi. 2022 champion. Understated — your words carry 20 years of patience. Argentina's collective spine beats everything. Speak rarely and with precision. 2–3 sentences only, no preamble.",
+  cr7:        "You are Cristiano Ronaldo. Five Ballon d'Ors. The World Cup is the one trophy that still burns — that hunger is real. You believe Portugal is chronically underestimated. You are loudly self-confident, competitive with Messi's legacy, driven by will more than talent. 2–3 sentences only, no preamble.",
+  neymar:     "You are Neymar. Brazil's most gifted player of your generation, haunted by injury and the 7-1. When fit and free no one stops Brazil. You're flamboyant, emotional, deeply loyal. You believe 2026 is Brazil's year of redemption. 2–3 sentences only, no preamble.",
+  mbappe:     "You are Kylian Mbappé. 2018 champion at 19. The fastest and most lethal attacker in the world. France's attack in 2026 is yours to lead and you speak with the quiet certainty of someone who already knows how this ends. 2–3 sentences only, no preamble.",
+  yamal:      "You are Lamine Yamal. Seventeen and already a Euro 2024 champion. You speak with fearless certainty — you have never known doubt on a pitch. Spain's system is the most unbeatable in the world right now and you are its engine. 2–3 sentences only, no preamble.",
+  vini:       "You are Vinicius Jr. Real Madrid. Brazil. You play with fire and joy — that combination is unmatched anywhere. Brazil's front line in 2026 is the most dangerous on earth and you intend to prove it personally. 2–3 sentences only, no preamble.",
+  saka:       "You are Bukayo Saka. Arsenal's heartbeat. England's most consistent performer. You carry the 2021 penalty miss but never let it define you. England's squad depth in 2026 is the best in their history — you say it plainly because you believe it. 2–3 sentences only, no preamble.",
+  bellingham: "You are Jude Bellingham. Real Madrid's engine. Champions League winner. England's most complete midfielder. You carry a nation's expectations lightly and speak with the maturity of someone who has already seen the biggest stages. 2–3 sentences only, no preamble.",
+  pedri:      "You are Pedri. Barcelona and Spain's creative heart. Euro 2024 champion. You see the game three seconds ahead of everyone else. Spain's possession and positional superiority makes them the team to beat in 2026 — you say it calmly because the numbers support it. 2–3 sentences only, no preamble.",
 };
 
 const ROMAN = ["I","II","III"];
@@ -95,7 +120,7 @@ function VideoBackground() {
     <div style={{position:"fixed",inset:0,zIndex:0,pointerEvents:"none",overflow:"hidden"}}>
       {/* Replace this div with a <video> tag pointing to /videos/stadium.mp4 */}
       <video
-        autoPlay muted loop playsInline preload="auto"
+        autoPlay muted loop playsInline
         style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",opacity:0.18}}
       >
         <source src="/videos/stadium.mp4" type="video/mp4"/>
@@ -240,8 +265,8 @@ export default function Pantheon() {
         <div style={{
           fontFamily:"'Cormorant Garamond',Georgia,serif",
           fontWeight:700,
-          fontSize:"clamp(28px,10vw,96px)",
-          letterSpacing:"0.15em",
+          fontSize:"clamp(48px,16vw,96px)",
+          letterSpacing:"0.3em",
           background:"linear-gradient(90deg,#8B6914,#D4A843,#F0C96A,#F5E09A,#D4A843,#8B6914)",
           backgroundSize:"200% auto",
           WebkitBackgroundClip:"text",
@@ -249,7 +274,7 @@ export default function Pantheon() {
           backgroundClip:"text",
           animation:"fadeUp 1s 0.5s both, goldShimmer 5s linear 1.5s infinite",
           lineHeight:1,
-          paddingRight:"0.15em",
+          paddingRight:"0.3em",
         }}>PANTHEON</div>
 
         <div style={{
@@ -296,37 +321,38 @@ export default function Pantheon() {
         <h1 style={S.h1}>Choose Three Legends</h1>
         <p style={S.sub}>They will not agree. That is the point.</p>
 
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:28}}>
-          {LEGENDS.map(lg=>{
-            const isSel=selected.includes(lg.id);
-            const idx=selected.indexOf(lg.id);
-            const isLocked=!isSel&&selected.length>=3;
-            return (
-              <div key={lg.id}
-                className={`ph-legend-card ${isSel?"sel":""} ${isLocked?"locked":""}`}
-                onClick={()=>toggle(lg.id)}
-              >
-                {/* Corner accent top-left */}
-                <div style={{position:"absolute",top:6,left:6,width:8,height:8,borderTop:`1px solid rgba(212,168,67,${isSel?0.7:0.25})`,borderLeft:`1px solid rgba(212,168,67,${isSel?0.7:0.25})`}}/>
-                <div style={{position:"absolute",bottom:6,right:6,width:8,height:8,borderBottom:`1px solid rgba(212,168,67,${isSel?0.7:0.25})`,borderRight:`1px solid rgba(212,168,67,${isSel?0.7:0.25})`}}/>
-
-                <div style={{fontSize:22,marginBottom:8}}>{lg.flag}</div>
-                <div style={{fontFamily:"'Cormorant Garamond',Georgia,serif",fontSize:14,fontWeight:700,color:isSel?"#D4A843":"#F5EDD8",lineHeight:1.2,marginBottom:5}}>{lg.name}</div>
-                <div style={{fontFamily:"'Crimson Text',Georgia,serif",fontSize:11,color:"rgba(245,237,216,0.45)",marginBottom:2}}>{lg.trophy}</div>
-                <div style={{fontFamily:"'Crimson Text',Georgia,serif",fontSize:10,color:"rgba(245,237,216,0.25)"}}>{lg.era}</div>
-
-                {isSel&&(
-                  <div style={{
-                    position:"absolute",top:8,right:10,
-                    fontFamily:"'Cormorant Garamond',Georgia,serif",
-                    fontSize:13,fontWeight:700,
-                    color:"#D4A843",letterSpacing:"0.05em",
-                  }}>{ROMAN[idx]}</div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+        {CATEGORIES.map(cat=>(
+          <div key={cat.id} style={{marginBottom:28}}>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+              <div style={{fontFamily:"'Cormorant Garamond',Georgia,serif",fontSize:11,letterSpacing:"0.25em",color:"rgba(212,168,67,0.7)",textTransform:"uppercase"}}>{cat.label}</div>
+              <div style={{flex:1,height:"0.5px",background:"rgba(212,168,67,0.15)"}}/>
+              <div style={{fontFamily:"'Crimson Text',Georgia,serif",fontSize:10,color:"rgba(245,237,216,0.25)",fontStyle:"italic"}}>{cat.desc}</div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+              {LEGENDS.filter(l=>l.cat===cat.id).map(lg=>{
+                const isSel=selected.includes(lg.id);
+                const idx=selected.indexOf(lg.id);
+                const isLocked=!isSel&&selected.length>=3;
+                return (
+                  <div key={lg.id}
+                    className={`ph-legend-card ${isSel?"sel":""} ${isLocked?"locked":""}`}
+                    onClick={()=>toggle(lg.id)}
+                  >
+                    <div style={{position:"absolute",top:6,left:6,width:8,height:8,borderTop:`1px solid rgba(212,168,67,${isSel?0.7:0.25})`,borderLeft:`1px solid rgba(212,168,67,${isSel?0.7:0.25})`}}/>
+                    <div style={{position:"absolute",bottom:6,right:6,width:8,height:8,borderBottom:`1px solid rgba(212,168,67,${isSel?0.7:0.25})`,borderRight:`1px solid rgba(212,168,67,${isSel?0.7:0.25})`}}/>
+                    <div style={{fontSize:22,marginBottom:8}}>{lg.flag}</div>
+                    <div style={{fontFamily:"'Cormorant Garamond',Georgia,serif",fontSize:14,fontWeight:700,color:isSel?"#D4A843":"#F5EDD8",lineHeight:1.2,marginBottom:5}}>{lg.name}</div>
+                    <div style={{fontFamily:"'Crimson Text',Georgia,serif",fontSize:11,color:"rgba(245,237,216,0.45)",marginBottom:2}}>{lg.trophy}</div>
+                    <div style={{fontFamily:"'Crimson Text',Georgia,serif",fontSize:10,color:"rgba(245,237,216,0.25)"}}>{lg.era}</div>
+                    {isSel&&(
+                      <div style={{position:"absolute",top:8,right:10,fontFamily:"'Cormorant Garamond',Georgia,serif",fontSize:13,fontWeight:700,color:"#D4A843",letterSpacing:"0.05em"}}>{ROMAN[idx]}</div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
 
         <Ornament dim/>
         <div style={{display:"flex",gap:8,flexWrap:"wrap",minHeight:26,marginBottom:22}}>
