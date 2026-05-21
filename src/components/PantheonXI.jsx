@@ -89,6 +89,23 @@ function ParticleCanvas() {
   return <canvas ref={ref} style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none"}}/>;
 }
 
+
+function VideoBackground() {
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:0,pointerEvents:"none",overflow:"hidden"}}>
+      {/* Replace this div with a <video> tag pointing to /videos/stadium.mp4 */}
+      <video
+        autoPlay muted loop playsInline
+        style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",opacity:0.18}}
+      >
+        <source src="/videos/stadium.mp4" type="video/mp4"/>
+      </video>
+      <div style={{position:"absolute",inset:0,background:"rgba(8,8,12,0.82)"}}/>
+      <div style={{position:"absolute",inset:0,backgroundImage:"repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(212,168,67,0.03) 60px),repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(212,168,67,0.03) 60px)"}}/>
+    </div>
+  )
+}
+
 function Ornament({dim=false}) {
   const c = dim ? "rgba(212,168,67,0.18)" : "rgba(212,168,67,0.35)";
   return (
@@ -206,8 +223,10 @@ export default function Pantheon() {
   // ── INTRO ─────────────────────────────────────────────────────────────
   if(phase==="intro") return (
     <div onClick={()=>setPhase("select")} style={{position:"relative",width:"100%",height:"100vh",background:"#08080C",cursor:"pointer",overflow:"hidden",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
-      <ParticleCanvas/>
-      <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse 70% 50% at 50% 45%, rgba(26,16,2,0.9) 0%, rgba(8,8,12,0.5) 70%)",pointerEvents:"none"}}/>
+      <VideoBackground/>
+      <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:1}}>
+        <ParticleCanvas/>
+      </div>
 
       <div style={{position:"relative",zIndex:2,textAlign:"center",padding:"0 24px"}}>
         {/* Horizontal lines sweep */}
@@ -268,9 +287,9 @@ export default function Pantheon() {
   // ── SELECT ───────────────────────────────────────────────────────────
   if(phase==="select") return (
     <div style={S.wrap}>
-      <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
+      <VideoBackground/>
+      <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:1}}>
         <ParticleCanvas/>
-        <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse 80% 60% at 50% 30%, rgba(20,12,2,0.95) 0%, rgba(8,8,12,0.7) 70%)"}}/>
       </div>
       <div style={{...S.page,animation:"fadeUp 0.5s ease both"}}>
         <div style={S.stepLabel}>— Summon the Council</div>
@@ -332,9 +351,9 @@ export default function Pantheon() {
   // ── QUESTION ──────────────────────────────────────────────────────────
   if(phase==="question") return (
     <div style={S.wrap}>
-      <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0}}>
+      <VideoBackground/>
+      <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:1}}>
         <ParticleCanvas/>
-        <div style={{position:"absolute",inset:0,background:"rgba(8,8,12,0.8)"}}/>
       </div>
       <div style={{...S.page,animation:"fadeUp 0.5s ease both"}}>
         <button className="ph-btn-ghost" style={{...S.btnGhost,marginBottom:32,fontSize:11,letterSpacing:"0.15em"}} onClick={()=>setPhase("select")}>← Back</button>
@@ -375,9 +394,9 @@ export default function Pantheon() {
   // ── DEBATE ────────────────────────────────────────────────────────────
   if(phase==="debate") return (
     <div style={S.wrap}>
-      <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0}}>
+      <VideoBackground/>
+      <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:1}}>
         <ParticleCanvas/>
-        <div style={{position:"absolute",inset:0,background:"rgba(8,8,12,0.88)"}}/>
       </div>
       <div style={{...S.page,paddingBottom:140,animation:"fadeUp 0.5s ease both"}}>
         <div style={S.stepLabel}>— The Tribunal</div>
@@ -457,9 +476,9 @@ export default function Pantheon() {
   // ── CONSENSUS ─────────────────────────────────────────────────────────
   if(phase==="consensus") return (
     <div style={S.wrap}>
-      <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0}}>
+      <VideoBackground/>
+      <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:1}}>
         <ParticleCanvas/>
-        <div style={{position:"absolute",inset:0,background:"rgba(8,8,12,0.9)"}}/>
       </div>
       <div style={{...S.page,animation:"fadeUp 0.5s ease both"}}>
         <div style={S.stepLabel}>— The Verdict</div>
