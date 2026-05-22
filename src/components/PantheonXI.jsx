@@ -544,7 +544,7 @@ export default function Pantheon() {
                   rel="noopener noreferrer"
                   style={{ color: GOLD, textDecoration: "underline", textUnderlineOffset: "3px" }}
                 >
-                  View Token #{mintedTokenId}
+                  View your NFT
                 </a>
               )}{" "}
               Return after the final whistle — the council will answer for their prediction.
