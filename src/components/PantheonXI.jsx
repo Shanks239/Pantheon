@@ -47,7 +47,7 @@ const PERSONAS = {
   pedri:      "You are Pedri. Barcelona and Spain's creative heart. Euro 2024 champion. Spain's possession makes them the team to beat in 2026. 2-3 sentences only, no preamble.",
 };
 
-const ROMAN = ["I","II","III"];
+const ROMAN = ["I","II","III","IV","V"];
 const GOLD = "#D4A843";
 const GOLD_DIM = "rgba(212,168,67,0.1)";
 const GOLD_BORDER = "rgba(212,168,67,0.3)";
@@ -214,7 +214,7 @@ export default function Pantheon() {
 
   const toggle = (id) => {
     if (selected.includes(id)) setSelected((s) => s.filter((x) => x !== id));
-    else if (selected.length < 3) setSelected((s) => [...s, id]);
+    else if (selected.length < 5) setSelected((s) => [...s, id]);
   };
 
   const startDebate = async () => {
@@ -334,8 +334,8 @@ export default function Pantheon() {
       <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 1 }}><ParticleCanvas /></div>
       <div style={{ ...S.page, animation: "fadeUp 0.5s ease both" }}>
         <div style={S.stepLabel}>— Summon the Council</div>
-        <h1 style={S.h1}>Choose Three Legends</h1>
-        <p style={S.sub}>They will not agree. That is the point.</p>
+        <h1 style={S.h1}>Choose Your Council</h1>
+        <p style={S.sub}>Pick 2–5 legends. Three is the sweet spot. They will not agree.</p>
 
         {CATEGORIES.map((cat) => {
           const isOpen = openCats[cat.id];
@@ -355,7 +355,7 @@ export default function Pantheon() {
                   {LEGENDS.filter((l) => l.cat === cat.id).map((lg) => {
                     const isSel = selected.includes(lg.id);
                     const idx = selected.indexOf(lg.id);
-                    const isLocked = !isSel && selected.length >= 3;
+                    const isLocked = !isSel && selected.length >= 5;
                     return (
                       <div key={lg.id} className={`ph-legend-card${isSel ? " sel" : ""}${isLocked ? " locked" : ""}`} onClick={() => toggle(lg.id)}>
                         <div style={{ position: "absolute", top: 6, left: 6, width: 8, height: 8, borderTop: `1px solid rgba(212,168,67,${isSel ? 0.7 : 0.25})`, borderLeft: `1px solid rgba(212,168,67,${isSel ? 0.7 : 0.25})` }} />
@@ -380,9 +380,9 @@ export default function Pantheon() {
             const lg = LEGENDS.find((l) => l.id === id);
             return <span key={id} style={{ fontFamily: "'Crimson Text',Georgia,serif", fontSize: 12, color: GOLD, background: GOLD_DIM, border: `0.5px solid ${GOLD_BORDER}`, borderRadius: 2, padding: "3px 10px" }}>{lg.flag} {lg.name}</span>;
           })}
-          {selected.length < 3 && <span style={{ fontFamily: "'Crimson Text',Georgia,serif", fontSize: 12, color: "rgba(245,237,216,0.3)", padding: "3px 0" }}>{3 - selected.length} more</span>}
+          {selected.length < 5 && <span style={{ fontFamily: "'Crimson Text',Georgia,serif", fontSize: 12, color: "rgba(245,237,216,0.3)", padding: "3px 0" }}>{selected.length < 2 ? `pick at least ${2 - selected.length} more` : `${5 - selected.length} more optional`}</span>}
         </div>
-        <button className="ph-btn-gold" style={S.btnGold} disabled={selected.length !== 3} onClick={() => setPhase("question")}>
+        <button className="ph-btn-gold" style={S.btnGold} disabled={selected.length < 2} onClick={() => setPhase("question")}>
           Convene the Council →
         </button>
       </div>
@@ -544,7 +544,7 @@ export default function Pantheon() {
                   rel="noopener noreferrer"
                   style={{ color: GOLD, textDecoration: "underline", textUnderlineOffset: "3px" }}
                 >
-                  View your NFT
+                  View Token #{mintedTokenId}
                 </a>
               )}{" "}
               Return after the final whistle — the council will answer for their prediction.
