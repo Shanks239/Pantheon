@@ -5,8 +5,7 @@ export default async function handler(req) {
     return new Response('Method not allowed', { status: 405 })
   }
 
-  const body = await req.json()
-  const { model, system, messages, max_tokens } = body
+  const { model, system, messages, max_tokens } = await req.json()
 
   const openRouterMessages = [
     ...(system ? [{ role: 'system', content: system }] : []),
@@ -29,16 +28,7 @@ export default async function handler(req) {
   })
 
   const data = await res.json()
-
-  // Return full OpenRouter response for debugging
-  if (!data.choices?.[0]?.message?.content) {
-    return new Response(JSON.stringify({ error: data, content: [{ type: 'text', text: JSON.stringify(data) }] }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
-  }
-
-  const text = data.choices[0].message.content
+  const text = data.choices?.[0]?.message?.content ?? '...'
   return new Response(
     JSON.stringify({ content: [{ type: 'text', text }] }),
     { status: 200, headers: { 'Content-Type': 'application/json' } }
