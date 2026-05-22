@@ -539,12 +539,12 @@ export default function Pantheon() {
               Your NFT is sealed on X Layer.{" "}
               {mintedTokenId && (
                 <a
-                  href={`https://www.oklink.com/xlayer-test/nft/${CONTRACT_ADDRESS}/${mintedTokenId}`}
+                  href={`https://www.oklink.com/x-layer-testnet/token/${CONTRACT_ADDRESS}?tokenId=${mintedTokenId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: GOLD, textDecoration: "underline", textUnderlineOffset: "3px" }}
                 >
-                  View Token #{mintedTokenId}
+                  View your NFT
                 </a>
               )}{" "}
               Return after the final whistle — the council will answer for their prediction.
