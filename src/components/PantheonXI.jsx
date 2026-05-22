@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { connectWallet, mintVerdict, buildTokenURI, shortAddress } from "../lib/wallet.js";
 
 const CATEGORIES = [
   { id:"immortals",  label:"Immortals",  desc:"The ones who defined the game" },
@@ -176,6 +177,9 @@ export default function Pantheon() {
   const [loading, setLoading] = useState(false);
   const [consensus, setConsensus] = useState(null);
   const [minted, setMinted] = useState(false);
+  const [mintedTokenId, setMintedTokenId] = useState(null);
+  const [wallet, setWallet] = useState(null);
+  const [mintError, setMintError] = useState(null);
   const bottomRef = useRef(null);
   const [openCats, setOpenCats] = useState({"immortals":true,"contenders":false,"heirs":false});
   const toggleCat = (id) => setOpenCats(p=>({...p,[id]:!p[id]}));
@@ -553,9 +557,38 @@ export default function Pantheon() {
             <p style={{fontFamily:"'Crimson Text',Georgia,serif",fontSize:14,color:"rgba(245,237,216,0.45)",lineHeight:1.7,marginBottom:20}}>
               Mint this verdict as an NFT on X Layer. Hold it to unlock the council's reaction after the 2026 final whistle.
             </p>
-            <button className="ph-btn-gold" style={{...S.btnGold,marginBottom:10}} onClick={()=>setMinted(true)}>
-              Mint the Verdict on X Layer
-            </button>
+            {!wallet ? (
+              <button className="ph-btn-gold" style={{...S.btnGold,marginBottom:10}} onClick={async()=>{
+                try { const w=await connectWallet(); setWallet(w); }
+                catch(e){ setMintError(e.message); }
+              }}>
+                Connect OKX Wallet
+              </button>
+            ) : (
+              <div style={{marginBottom:10}}>
+                <div style={{fontFamily:"'Crimson Text',Georgia,serif",fontSize:11,color:"rgba(212,168,67,0.6)",marginBottom:8,textAlign:"center",letterSpacing:"0.1em"}}>
+                  {shortAddress(wallet.address)}
+                </div>
+                <button className="ph-btn-gold" style={{...S.btnGold}} disabled={loading} onClick={async()=>{
+                  setLoading(true); setMintError(null);
+                  try {
+                    const legendNames = selected.map(id=>LEGENDS.find(l=>l.id===id).name);
+                    const { tokenURI, debateHashHex } = buildTokenURI({ question, legends:legendNames, consensus, messages });
+                    const { tokenId } = await mintVerdict(wallet.signer, tokenURI, debateHashHex);
+                    setMintedTokenId(tokenId);
+                    setMinted(true);
+                  } catch(e){ setMintError(e.message); }
+                  setLoading(false);
+                }}>
+                  {loading ? "Minting…" : "Mint the Verdict on X Layer"}
+                </button>
+              </div>
+            )}
+            {mintError && (
+              <div style={{fontFamily:"'Crimson Text',Georgia,serif",fontSize:12,color:"#8B2020",marginBottom:10,textAlign:"center"}}>
+                {mintError}
+              </div>
+            )}
             <button className="ph-btn-ghost" style={{...S.btnGhost,width:"100%",fontSize:12,textAlign:"center"}} onClick={()=>{setPhase("debate");setConsensus(null);}}>
               Continue arguing
             </button>
@@ -574,7 +607,7 @@ export default function Pantheon() {
               Verdict Minted
             </div>
             <div style={{fontFamily:"'Crimson Text',Georgia,serif",fontSize:14,color:"rgba(245,237,216,0.45)",lineHeight:1.7,marginBottom:22}}>
-              Your NFT is sealed on X Layer. Return after the final whistle — the council will answer for their prediction.
+              Your NFT is sealed on X Layer.{mintedTokenId && <> Token #{mintedTokenId}.</>} Return after the final whistle — the council will answer for their prediction.
             </div>
             <span style={{fontFamily:"'Cormorant Garamond',Georgia,serif",fontSize:10,letterSpacing:"0.25em",color:"rgba(212,168,67,0.6)",border:"0.5px solid rgba(212,168,67,0.25)",padding:"5px 14px",borderRadius:2}}>
               PANTHEON XI · 2026

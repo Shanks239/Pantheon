@@ -3,7 +3,6 @@ import { XLAYER_CHAIN, CONTRACT_ADDRESS, CONTRACT_ABI } from './constants.js'
 
 // ── Connect wallet (OKX Wallet preferred, MetaMask fallback) ──────────────
 export async function connectWallet() {
-  // OKX Wallet injects window.okxwallet; fallback to window.ethereum
   const provider = window.okxwallet ?? window.ethereum
   if (!provider) throw new Error('No wallet found. Install OKX Wallet.')
 
@@ -13,7 +12,7 @@ export async function connectWallet() {
   const web3Provider = new ethers.BrowserProvider(provider)
   const signer = await web3Provider.getSigner()
   const address = await signer.getAddress()
-  return { signer, address, provider: web3Provider }
+  return { signer, address }
 }
 
 // ── Switch to X Layer testnet, add if missing ─────────────────────────────
@@ -34,29 +33,41 @@ async function switchToXLayer(provider) {
 }
 
 // ── Mint NFT ──────────────────────────────────────────────────────────────
-export async function mintVerdict(signer, tokenURI) {
-  if (!CONTRACT_ADDRESS) throw new Error('Contract not deployed yet.')
+export async function mintVerdict(signer, tokenURI, debateHashHex) {
   const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
-  const tx = await contract.mint(await signer.getAddress(), tokenURI)
+  const tx = await contract.mintVerdict(tokenURI, debateHashHex)
   const receipt = await tx.wait()
-  return receipt
+  // Extract tokenId from VerdictMinted event
+  const event = receipt.logs
+    .map(log => { try { return contract.interface.parseLog(log) } catch { return null } })
+    .find(e => e?.name === 'VerdictMinted')
+  return { receipt, tokenId: event?.args?.tokenId?.toString() ?? null }
 }
 
-// ── Build token metadata (stored on-chain or IPFS) ────────────────────────
+// ── Build token metadata URI ──────────────────────────────────────────────
 export function buildTokenURI({ question, legends, consensus, messages }) {
-  const debateHash = ethers.keccak256(
-    ethers.toUtf8Bytes(messages.map(m => `${m.legendId}:${m.content}`).join('|'))
-  )
+  const debateString = messages.map(m => `${m.legendId}:${m.content}`).join('|')
+  const debateHashHex = ethers.keccak256(ethers.toUtf8Bytes(debateString))
+
   const metadata = {
     name: 'Pantheon XI Verdict',
     description: consensus,
     attributes: [
-      { trait_type: 'Question',   value: question },
-      { trait_type: 'Legends',    value: legends.join(', ') },
-      { trait_type: 'DebateHash', value: debateHash },
-      { trait_type: 'Tournament', value: '2026 FIFA World Cup' },
+      { trait_type: 'Question',    value: question },
+      { trait_type: 'Legends',     value: legends.join(', ') },
+      { trait_type: 'DebateHash',  value: debateHashHex },
+      { trait_type: 'Tournament',  value: '2026 FIFA World Cup' },
     ],
   }
-  // Inline base64 data URI — replace with IPFS upload in production
-  return 'data:application/json;base64,' + btoa(JSON.stringify(metadata))
+
+  const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(metadata))))
+  return {
+    tokenURI: 'data:application/json;base64,' + base64,
+    debateHashHex,
+  }
+}
+
+// ── Truncate address for display ──────────────────────────────────────────
+export function shortAddress(addr) {
+  return addr ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : ''
 }

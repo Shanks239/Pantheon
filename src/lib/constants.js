@@ -1,6 +1,6 @@
 // ─── X Layer Network Config ───────────────────────────────────────────────
 export const XLAYER_CHAIN = {
-  chainId: '0xC3',          // 195 decimal — X Layer testnet
+  chainId: '0x7A0',         // 1952 — X Layer testnet
   chainName: 'X Layer Testnet',
   nativeCurrency: { name: 'OKB', symbol: 'OKB', decimals: 18 },
   rpcUrls: ['https://testrpc.xlayer.tech'],
@@ -8,7 +8,7 @@ export const XLAYER_CHAIN = {
 }
 
 export const XLAYER_MAINNET = {
-  chainId: '0xC4',          // 196 decimal — X Layer mainnet
+  chainId: '0xC4',          // 196 — X Layer mainnet
   chainName: 'X Layer',
   nativeCurrency: { name: 'OKB', symbol: 'OKB', decimals: 18 },
   rpcUrls: ['https://rpc.xlayer.tech'],
@@ -16,11 +16,51 @@ export const XLAYER_MAINNET = {
 }
 
 // ─── Contract ─────────────────────────────────────────────────────────────
-// Populate after deploying PantheonNFT.sol
-export const CONTRACT_ADDRESS = ''
-export const CONTRACT_ABI = []   // paste ABI here after compile
+export const CONTRACT_ADDRESS = '0x7D7D338BAb8e19bad2c0959f15fe5d7ad6737708'
+
+export const CONTRACT_ABI = [
+  { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
+  { inputs: [{ internalType: 'address', name: 'sender', type: 'address' }, { internalType: 'uint256', name: 'tokenId', type: 'uint256' }, { internalType: 'address', name: 'owner', type: 'address' }], name: 'ERC721IncorrectOwner', type: 'error' },
+  { inputs: [{ internalType: 'address', name: 'operator', type: 'address' }, { internalType: 'uint256', name: 'tokenId', type: 'uint256' }], name: 'ERC721InsufficientApproval', type: 'error' },
+  { inputs: [{ internalType: 'address', name: 'approver', type: 'address' }], name: 'ERC721InvalidApprover', type: 'error' },
+  { inputs: [{ internalType: 'address', name: 'operator', type: 'address' }], name: 'ERC721InvalidOperator', type: 'error' },
+  { inputs: [{ internalType: 'address', name: 'owner', type: 'address' }], name: 'ERC721InvalidOwner', type: 'error' },
+  { inputs: [{ internalType: 'address', name: 'receiver', type: 'address' }], name: 'ERC721InvalidReceiver', type: 'error' },
+  { inputs: [{ internalType: 'address', name: 'sender', type: 'address' }], name: 'ERC721InvalidSender', type: 'error' },
+  { inputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }], name: 'ERC721NonexistentToken', type: 'error' },
+  { inputs: [{ internalType: 'address', name: 'owner', type: 'address' }], name: 'OwnableInvalidOwner', type: 'error' },
+  { inputs: [{ internalType: 'address', name: 'account', type: 'address' }], name: 'OwnableUnauthorizedAccount', type: 'error' },
+  { anonymous: false, inputs: [{ indexed: true, internalType: 'address', name: 'owner', type: 'address' }, { indexed: true, internalType: 'address', name: 'approved', type: 'address' }, { indexed: true, internalType: 'uint256', name: 'tokenId', type: 'uint256' }], name: 'Approval', type: 'event' },
+  { anonymous: false, inputs: [{ indexed: true, internalType: 'address', name: 'owner', type: 'address' }, { indexed: true, internalType: 'address', name: 'operator', type: 'address' }, { indexed: false, internalType: 'bool', name: 'approved', type: 'bool' }], name: 'ApprovalForAll', type: 'event' },
+  { anonymous: false, inputs: [{ indexed: false, internalType: 'uint256', name: '_fromTokenId', type: 'uint256' }, { indexed: false, internalType: 'uint256', name: '_toTokenId', type: 'uint256' }], name: 'BatchMetadataUpdate', type: 'event' },
+  { anonymous: false, inputs: [{ indexed: false, internalType: 'uint256', name: '_tokenId', type: 'uint256' }], name: 'MetadataUpdate', type: 'event' },
+  { anonymous: false, inputs: [{ indexed: true, internalType: 'address', name: 'previousOwner', type: 'address' }, { indexed: true, internalType: 'address', name: 'newOwner', type: 'address' }], name: 'OwnershipTransferred', type: 'event' },
+  { anonymous: false, inputs: [{ indexed: true, internalType: 'address', name: 'from', type: 'address' }, { indexed: true, internalType: 'address', name: 'to', type: 'address' }, { indexed: true, internalType: 'uint256', name: 'tokenId', type: 'uint256' }], name: 'Transfer', type: 'event' },
+  { anonymous: false, inputs: [{ indexed: true, internalType: 'address', name: 'minter', type: 'address' }, { indexed: false, internalType: 'uint256', name: 'tokenId', type: 'uint256' }, { indexed: false, internalType: 'bytes32', name: 'debateHash', type: 'bytes32' }], name: 'VerdictMinted', type: 'event' },
+  { anonymous: false, inputs: [{ indexed: false, internalType: 'uint256', name: 'tokenId', type: 'uint256' }], name: 'VerdictRevealed', type: 'event' },
+  { inputs: [{ internalType: 'address', name: 'to', type: 'address' }, { internalType: 'uint256', name: 'tokenId', type: 'uint256' }], name: 'approve', outputs: [], stateMutability: 'nonpayable', type: 'function' },
+  { inputs: [{ internalType: 'address', name: 'owner', type: 'address' }], name: 'balanceOf', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }], stateMutability: 'view', type: 'function' },
+  { inputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }], name: 'canAccessVerdict', outputs: [{ internalType: 'bool', name: '', type: 'bool' }], stateMutability: 'view', type: 'function' },
+  { inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }], name: 'debateHash', outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }], stateMutability: 'view', type: 'function' },
+  { inputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }], name: 'getApproved', outputs: [{ internalType: 'address', name: '', type: 'address' }], stateMutability: 'view', type: 'function' },
+  { inputs: [{ internalType: 'address', name: 'owner', type: 'address' }, { internalType: 'address', name: 'operator', type: 'address' }], name: 'isApprovedForAll', outputs: [{ internalType: 'bool', name: '', type: 'bool' }], stateMutability: 'view', type: 'function' },
+  { inputs: [{ internalType: 'string', name: 'tokenURI', type: 'string' }, { internalType: 'bytes32', name: '_debateHash', type: 'bytes32' }], name: 'mintVerdict', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }], stateMutability: 'nonpayable', type: 'function' },
+  { inputs: [], name: 'name', outputs: [{ internalType: 'string', name: '', type: 'string' }], stateMutability: 'view', type: 'function' },
+  { inputs: [], name: 'owner', outputs: [{ internalType: 'address', name: '', type: 'address' }], stateMutability: 'view', type: 'function' },
+  { inputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }], name: 'ownerOf', outputs: [{ internalType: 'address', name: '', type: 'address' }], stateMutability: 'view', type: 'function' },
+  { inputs: [], name: 'renounceOwnership', outputs: [], stateMutability: 'nonpayable', type: 'function' },
+  { inputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }], name: 'revealVerdict', outputs: [], stateMutability: 'nonpayable', type: 'function' },
+  { inputs: [{ internalType: 'address', name: 'from', type: 'address' }, { internalType: 'address', name: 'to', type: 'address' }, { internalType: 'uint256', name: 'tokenId', type: 'uint256' }], name: 'safeTransferFrom', outputs: [], stateMutability: 'nonpayable', type: 'function' },
+  { inputs: [{ internalType: 'address', name: 'from', type: 'address' }, { internalType: 'address', name: 'to', type: 'address' }, { internalType: 'uint256', name: 'tokenId', type: 'uint256' }, { internalType: 'bytes', name: 'data', type: 'bytes' }], name: 'safeTransferFrom', outputs: [], stateMutability: 'nonpayable', type: 'function' },
+  { inputs: [{ internalType: 'address', name: 'operator', type: 'address' }, { internalType: 'bool', name: 'approved', type: 'bool' }], name: 'setApprovalForAll', outputs: [], stateMutability: 'nonpayable', type: 'function' },
+  { inputs: [{ internalType: 'bytes4', name: 'interfaceId', type: 'bytes4' }], name: 'supportsInterface', outputs: [{ internalType: 'bool', name: '', type: 'bool' }], stateMutability: 'view', type: 'function' },
+  { inputs: [], name: 'symbol', outputs: [{ internalType: 'string', name: '', type: 'string' }], stateMutability: 'view', type: 'function' },
+  { inputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }], name: 'tokenURI', outputs: [{ internalType: 'string', name: '', type: 'string' }], stateMutability: 'view', type: 'function' },
+  { inputs: [], name: 'totalSupply', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }], stateMutability: 'view', type: 'function' },
+  { inputs: [{ internalType: 'address', name: 'from', type: 'address' }, { internalType: 'address', name: 'to', type: 'address' }, { internalType: 'uint256', name: 'tokenId', type: 'uint256' }], name: 'transferFrom', outputs: [], stateMutability: 'nonpayable', type: 'function' },
+  { inputs: [{ internalType: 'address', name: 'newOwner', type: 'address' }], name: 'transferOwnership', outputs: [], stateMutability: 'nonpayable', type: 'function' },
+  { inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }], name: 'verdictRevealed', outputs: [{ internalType: 'bool', name: '', type: 'bool' }], stateMutability: 'view', type: 'function' },
+]
 
 // ─── Anthropic ────────────────────────────────────────────────────────────
-// In production: proxy through a Vercel serverless function
-// Never expose this key in client-side code on mainnet
-export const ANTHROPIC_MODEL  = 'claude-sonnet-4-20250514'
+export const ANTHROPIC_MODEL = 'claude-sonnet-4-20250514'
