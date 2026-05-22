@@ -71,3 +71,13 @@ export function buildTokenURI({ question, legends, consensus, messages }) {
 export function shortAddress(addr) {
   return addr ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : ''
 }
+
+// ── Check token ownership + reveal status ────────────────────────────────
+export async function checkOwnership(signer, tokenId) {
+  const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
+  const owner = await contract.ownerOf(tokenId)
+  const address = await signer.getAddress()
+  const isOwner = owner.toLowerCase() === address.toLowerCase()
+  const revealed = await contract.verdictRevealed(tokenId)
+  return { isOwner, revealed }
+}

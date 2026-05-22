@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { connectWallet, mintVerdict, buildTokenURI, shortAddress } from "../lib/wallet.js";
+import { connectWallet, mintVerdict, buildTokenURI, shortAddress, checkOwnership } from "../lib/wallet.js";
 
 const CONTRACT_ADDRESS = '0x7D7D338BAb8e19bad2c0959f15fe5d7ad6737708';
 
@@ -178,6 +178,8 @@ export default function Pantheon() {
   const [mintedTokenId, setMintedTokenId] = useState(null);
   const [wallet, setWallet] = useState(null);
   const [mintError, setMintError] = useState(null);
+  const [unlockTokenId, setUnlockTokenId] = useState("");
+  const [unlockStatus, setUnlockStatus] = useState(null); // null | "checking" | "granted" | "denied" | "unrevealed"
   const [openCats, setOpenCats] = useState({ immortals: true, contenders: false, heirs: false });
   const bottomRef = useRef(null);
 
@@ -280,6 +282,22 @@ export default function Pantheon() {
       setMintError(e.message);
     }
     setLoading(false);
+  };
+
+  const handleUnlock = async () => {
+    if (!unlockTokenId.trim()) return;
+    setUnlockStatus("checking");
+    try {
+      let w = wallet;
+      if (!w) { w = await connectWallet(); setWallet(w); }
+      const { isOwner, revealed } = await checkOwnership(w.signer, unlockTokenId);
+      if (!isOwner) setUnlockStatus("denied");
+      else if (!revealed) setUnlockStatus("unrevealed");
+      else setUnlockStatus("granted");
+    } catch (e) {
+      setMintError(e.message);
+      setUnlockStatus(null);
+    }
   };
 
   // ── INTRO ──────────────────────────────────────────────────────────────
@@ -521,12 +539,12 @@ export default function Pantheon() {
               Your NFT is sealed on X Layer.{" "}
               {mintedTokenId && (
                 <a
-                  href={`https://www.oklink.com/x-layer-testnet/token/${CONTRACT_ADDRESS}?tokenId=${mintedTokenId}`}
+                  href={`https://www.oklink.com/xlayer-test/nft/${CONTRACT_ADDRESS}/${mintedTokenId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: GOLD, textDecoration: "underline", textUnderlineOffset: "3px" }}
                 >
-                  View your NFT
+                  View Token #{mintedTokenId}
                 </a>
               )}{" "}
               Return after the final whistle — the council will answer for their prediction.
@@ -534,7 +552,81 @@ export default function Pantheon() {
             <span style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 10, letterSpacing: "0.25em", color: "rgba(212,168,67,0.6)", border: "0.5px solid rgba(212,168,67,0.25)", padding: "5px 14px", borderRadius: 2 }}>
               PANTHEON XI · 2026
             </span>
+            <div style={{ marginTop: 28 }}>
+              <button className="ph-btn-ghost" style={{ ...S.btnGhost, width: "100%", fontSize: 12, textAlign: "center" }} onClick={() => setPhase("unlock")}>
+                Return after the final whistle →
+              </button>
+            </div>
           </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
+    </div>
+  );
+
+  // ── UNLOCK ────────────────────────────────────────────────────────────
+  if (phase === "unlock") return (
+    <div style={S.wrap}>
+      <VideoBackground />
+      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 1 }}><ParticleCanvas /></div>
+      <div style={{ ...S.page, animation: "fadeUp 0.5s ease both" }}>
+        <button className="ph-btn-ghost" style={{ ...S.btnGhost, marginBottom: 32, fontSize: 11 }} onClick={() => setPhase("consensus")}>← Back</button>
+        <div style={S.stepLabel}>— Post-Tournament</div>
+        <h1 style={{ ...S.h1, marginBottom: 8 }}>The Final Whistle</h1>
+        <p style={{ ...S.sub, marginBottom: 28 }}>Enter your token ID to hear the council's verdict on what actually happened.</p>
+
+        <Ornament dim />
+
+        {unlockStatus === "granted" ? (
+          <div style={{ animation: "sealIn 0.5s ease both" }}>
+            <div style={{ animation: "sealIn 0.6s ease both", position: "relative", border: "0.5px solid rgba(212,168,67,0.5)", borderRadius: 2, padding: "28px 22px", background: "rgba(212,168,67,0.06)", marginBottom: 24 }}>
+              <div style={{ position: "absolute", top: 7, left: 7, width: 12, height: 12, borderTop: "1px solid rgba(212,168,67,0.55)", borderLeft: "1px solid rgba(212,168,67,0.55)" }} />
+              <div style={{ position: "absolute", top: 7, right: 7, width: 12, height: 12, borderTop: "1px solid rgba(212,168,67,0.55)", borderRight: "1px solid rgba(212,168,67,0.55)" }} />
+              <div style={{ position: "absolute", bottom: 7, left: 7, width: 12, height: 12, borderBottom: "1px solid rgba(212,168,67,0.55)", borderLeft: "1px solid rgba(212,168,67,0.55)" }} />
+              <div style={{ position: "absolute", bottom: 7, right: 7, width: 12, height: 12, borderBottom: "1px solid rgba(212,168,67,0.55)", borderRight: "1px solid rgba(212,168,67,0.55)" }} />
+              <div style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 11, letterSpacing: "0.25em", color: GOLD, textTransform: "uppercase", marginBottom: 16 }}>The Council Responds</div>
+              <div style={{ fontFamily: "'Crimson Text',Georgia,serif", fontSize: 16, lineHeight: 1.85, color: CREAM }}>
+                The tournament has spoken. The legends now answer for their predictions — the full post-tournament verdict has been unlocked for your token.
+              </div>
+            </div>
+            <a
+              href={`https://www.oklink.com/x-layer-testnet/token/${CONTRACT_ADDRESS}?tokenId=${unlockTokenId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: "block", textAlign: "center", fontFamily: "'Crimson Text',Georgia,serif", fontSize: 13, color: GOLD, textDecoration: "underline", textUnderlineOffset: "3px" }}
+            >
+              View NFT on OKLink
+            </a>
+          </div>
+        ) : unlockStatus === "unrevealed" ? (
+          <div style={{ animation: "sealIn 0.5s ease both", fontFamily: "'Crimson Text',Georgia,serif", fontSize: 15, color: MUTED, lineHeight: 1.75, textAlign: "center", padding: "24px 0" }}>
+            <div style={{ fontSize: 28, marginBottom: 16 }}>⏳</div>
+            The tournament is not yet over. Return after the final whistle on July 19, 2026.
+          </div>
+        ) : unlockStatus === "denied" ? (
+          <div style={{ animation: "sealIn 0.5s ease both", fontFamily: "'Crimson Text',Georgia,serif", fontSize: 15, color: "#8B2020", lineHeight: 1.75, textAlign: "center", padding: "24px 0" }}>
+            <div style={{ fontSize: 28, marginBottom: 16 }}>✕</div>
+            This wallet does not own Token #{unlockTokenId}. Connect the wallet that minted it.
+          </div>
+        ) : (
+          <>
+            <input
+              className="ph-input"
+              style={{ ...S.input, marginBottom: 16 }}
+              type="number"
+              placeholder="Enter your Token ID (e.g. 1)"
+              value={unlockTokenId}
+              onChange={(e) => setUnlockTokenId(e.target.value)}
+            />
+            <button className="ph-btn-gold" style={S.btnGold} disabled={!unlockTokenId.trim() || unlockStatus === "checking"} onClick={handleUnlock}>
+              {unlockStatus === "checking" ? (
+                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                  <span style={{ width: 12, height: 12, borderRadius: "50%", border: "1.5px solid rgba(212,168,67,0.25)", borderTopColor: GOLD, animation: "spin 0.85s linear infinite", display: "inline-block" }} />
+                  Verifying…
+                </span>
+              ) : "Unlock the Verdict"}
+            </button>
+          </>
         )}
         <div ref={bottomRef} />
       </div>
