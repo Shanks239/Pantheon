@@ -176,6 +176,7 @@ export default function Pantheon() {
   const [consensus, setConsensus] = useState(null);
   const [minted, setMinted] = useState(false);
   const [mintedTokenId, setMintedTokenId] = useState(null);
+  const [nftImage, setNftImage] = useState(null);
   const [wallet, setWallet] = useState(null);
   const [mintError, setMintError] = useState(null);
   const [unlockStatus, setUnlockStatus] = useState(null); // null | "checking" | "none" | "unrevealed" | "granted"
@@ -274,15 +275,17 @@ export default function Pantheon() {
     setMintError(null);
     try {
       const legendNames = selected.map((id) => LEGENDS.find((l) => l.id === id).name);
-      // Build metadata with placeholder ID first to get debateHash
-      const { debateHashHex } = buildTokenURI({ question, legends: legendNames, consensus, messages, tokenId: null });
+      // Build initial metadata to get debateHash
+      const { debateHashHex, imageDataURI: previewImage } = buildTokenURI({ question, legends: legendNames, consensus, messages, tokenId: null });
+      setNftImage(previewImage);
       // Mint to get token ID
       const { tokenId } = await mintVerdict(wallet.signer,
         buildTokenURI({ question, legends: legendNames, consensus, messages, tokenId: null }).tokenURI,
         debateHashHex
       );
-      // Rebuild metadata with real token ID and update URI (stored client-side for display)
-      const { tokenURI: finalURI } = buildTokenURI({ question, legends: legendNames, consensus, messages, tokenId });
+      // Rebuild with real token ID for final image
+      const { imageDataURI: finalImage } = buildTokenURI({ question, legends: legendNames, consensus, messages, tokenId });
+      setNftImage(finalImage);
       setMintedTokenId(tokenId);
       setMinted(true);
     } catch (e) {
@@ -539,9 +542,14 @@ export default function Pantheon() {
           <div style={{ textAlign: "center", animation: "sealIn 0.5s ease both" }}>
             <Ornament />
             <div style={{ width: 56, height: 56, borderRadius: "50%", border: "0.5px solid rgba(212,168,67,0.6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 22, background: "rgba(212,168,67,0.06)" }}>⚽</div>
-            <div style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 13, color: GOLD, letterSpacing: "0.25em", marginBottom: 10, textTransform: "uppercase" }}>
+            <div style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 13, color: GOLD, letterSpacing: "0.25em", marginBottom: 16, textTransform: "uppercase" }}>
               Verdict Minted
             </div>
+            {nftImage && (
+              <div style={{ marginBottom: 20, borderRadius: 4, overflow: "hidden", border: "0.5px solid rgba(212,168,67,0.3)", maxWidth: 280, margin: "0 auto 20px" }}>
+                <img src={nftImage} alt="Your Pantheon XI NFT" style={{ width: "100%", display: "block" }} />
+              </div>
+            )}
             <div style={{ fontFamily: "'Crimson Text',Georgia,serif", fontSize: 14, color: MUTED, lineHeight: 1.7, marginBottom: 22 }}>
               Your NFT is sealed on X Layer.{" "}
               {mintedTokenId && (

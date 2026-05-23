@@ -127,12 +127,18 @@ export function buildTokenURI({ question, legends, consensus, messages, tokenId 
   const debateString = messages.map(m => `${m.legendId}:${m.content}`).join('|')
   const debateHashHex = ethers.keccak256(ethers.toUtf8Bytes(debateString))
 
-  const image = generateNFTImage({ question, legends, consensus, tokenId, debateHashHex })
+  // In-app display: generate SVG as data URI
+  const imageDataURI = generateNFTImage({ question, legends, consensus, tokenId, debateHashHex })
+
+  // On-chain metadata: point image at Vercel API route so OKLink can render it
+  const imageURL = tokenId
+    ? `https://pantheon-ebon.vercel.app/api/nft-image?tokenId=${tokenId}`
+    : imageDataURI  // fallback for preview
 
   const metadata = {
     name: `Pantheon XI Verdict #${tokenId ?? '?'}`,
     description: consensus,
-    image,
+    image: imageURL,
     attributes: [
       { trait_type: 'Question',   value: question },
       { trait_type: 'Legends',    value: legends.join(', ') },
@@ -141,7 +147,11 @@ export function buildTokenURI({ question, legends, consensus, messages, tokenId 
     ],
   }
   const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(metadata))))
-  return { tokenURI: 'data:application/json;base64,' + base64, debateHashHex }
+  return {
+    tokenURI: 'data:application/json;base64,' + base64,
+    debateHashHex,
+    imageDataURI,  // returned for in-app display
+  }
 }
 
 // ── Truncate address for display ──────────────────────────────────────────
