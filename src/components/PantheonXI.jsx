@@ -288,6 +288,8 @@ export default function Pantheon() {
       setNftImage(finalImage);
       setMintedTokenId(tokenId);
       setMinted(true);
+      setMinted(true);
+      setShowMintModal(true);  // add this
     } catch (e) {
       setMintError(e.message);
     }
