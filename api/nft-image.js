@@ -40,7 +40,7 @@ export default async function handler(req, res) {
     const question = json.attributes?.find(a => a.trait_type === 'Question')?.value ?? ''
     const legendsStr = json.attributes?.find(a => a.trait_type === 'Legends')?.value ?? ''
     const legends = legendsStr ? legendsStr.split(', ').slice(0, 3) : []
-    const consensus = json.description ?? ''
+    const consensus = (json.description ?? '').replace(/\*\*/g, '').replace(/\*/g, '')
     const debateHashHex = json.attributes?.find(a => a.trait_type === 'DebateHash')?.value ?? ''
     const hashShort = debateHashHex ? debateHashHex.slice(0, 10) + '…' + debateHashHex.slice(-6) : ''
     const snippet = consensus.length > 180 ? consensus.slice(0, 180) + '…' : consensus

@@ -46,7 +46,7 @@ export async function mintVerdict(signer, tokenURI, debateHashHex) {
 // ── Generate NFT image as inline base64 SVG ───────────────────────────────
 function generateNFTImage({ question, legends, consensus, tokenId, debateHashHex }) {
   // Truncate consensus to ~200 chars, split into 4 lines of ~50 chars
-  const snippet = consensus.length > 220 ? consensus.slice(0, 220) + '…' : consensus
+  const snippet = (consensus.replace(/\*\*/g, '').replace(/\*/g, '')).slice(0, 220) + (consensus.length > 220 ? '…' : '')
   const words = snippet.split(' ')
   const lines = []
   let current = ''
@@ -137,7 +137,7 @@ export function buildTokenURI({ question, legends, consensus, messages, tokenId 
 
   const metadata = {
     name: `Pantheon XI Verdict #${tokenId ?? '?'}`,
-    description: consensus,
+    description: consensus,description: consensus.replace(/\*\*/g, '').replace(/\*/g, ''),
     image: imageURL,
     attributes: [
       { trait_type: 'Question',   value: question },

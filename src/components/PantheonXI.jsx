@@ -83,7 +83,7 @@ async function callConsensus(question, messages) {
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
       max_tokens: 1000,
-      system: "Distill this football legend debate into one concise verdict. State who they predict wins 2026 and the core reason. Note the sharpest disagreement if any. 3-4 sentences, no preamble.",
+      system: "Distill this football legend debate into one concise verdict. State who they predict wins 2026 and the core reason. Note the sharpest disagreement if any. 3-4 sentences, no preamble. Do not use markdown formatting — plain text only.",
       messages: [{ role: "user", content: `Question: "${question}"\n\nDebate:\n${transcript}\n\nVerdict:` }],
     }),
   });
