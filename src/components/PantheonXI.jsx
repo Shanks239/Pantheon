@@ -274,8 +274,15 @@ export default function Pantheon() {
     setMintError(null);
     try {
       const legendNames = selected.map((id) => LEGENDS.find((l) => l.id === id).name);
-      const { tokenURI, debateHashHex } = buildTokenURI({ question, legends: legendNames, consensus, messages });
-      const { tokenId } = await mintVerdict(wallet.signer, tokenURI, debateHashHex);
+      // Build metadata with placeholder ID first to get debateHash
+      const { debateHashHex } = buildTokenURI({ question, legends: legendNames, consensus, messages, tokenId: null });
+      // Mint to get token ID
+      const { tokenId } = await mintVerdict(wallet.signer,
+        buildTokenURI({ question, legends: legendNames, consensus, messages, tokenId: null }).tokenURI,
+        debateHashHex
+      );
+      // Rebuild metadata with real token ID and update URI (stored client-side for display)
+      const { tokenURI: finalURI } = buildTokenURI({ question, legends: legendNames, consensus, messages, tokenId });
       setMintedTokenId(tokenId);
       setMinted(true);
     } catch (e) {
