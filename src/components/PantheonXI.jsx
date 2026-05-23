@@ -166,6 +166,104 @@ const S = {
   input: { width: "100%", background: "rgba(245,237,216,0.04)", border: "0.5px solid rgba(245,237,216,0.12)", color: CREAM, fontFamily: "'Crimson Text',Georgia,serif", fontSize: 15, padding: "13px 14px", borderRadius: 2, outline: "none", resize: "none", lineHeight: 1.6 },
 };
 
+
+function MintSuccessModal({ tokenId, nftImage, onClose }) {
+  const explorerUrl = `https://www.oklink.com/x-layer-testnet/token/0x7D7D338BAb8e19bad2c0959f15fe5d7ad6737708?tokenId=${tokenId}`
+
+  const handleDownload = () => {
+    if (!nftImage) return
+    const a = document.createElement('a')
+    a.href = nftImage
+    a.download = `pantheon-xi-verdict-${tokenId}.svg`
+    a.click()
+  }
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 100,
+      background: "rgba(0,0,0,0.92)",
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      padding: "24px 20px",
+      animation: "fadeUp 0.4s ease both",
+    }}>
+      {/* Close */}
+      <button onClick={onClose} style={{
+        position: "absolute", top: 20, right: 20,
+        background: "transparent", border: "none",
+        color: "rgba(245,237,216,0.4)", fontSize: 22,
+        cursor: "pointer", lineHeight: 1,
+      }}>✕</button>
+
+      {/* Heading */}
+      <div style={{
+        fontFamily: "'Cormorant Garamond',Georgia,serif",
+        fontSize: 11, letterSpacing: "0.35em",
+        color: "rgba(212,168,67,0.6)", textTransform: "uppercase",
+        marginBottom: 8,
+      }}>Verdict Sealed</div>
+      <div style={{
+        fontFamily: "'Cormorant Garamond',Georgia,serif",
+        fontSize: 26, fontWeight: 700,
+        color: "#F5EDD8", marginBottom: 24, textAlign: "center",
+      }}>Token #{tokenId} is yours</div>
+
+      {/* NFT Image */}
+      {nftImage && (
+        <div style={{
+          width: "100%", maxWidth: 320,
+          borderRadius: 4, overflow: "hidden",
+          border: "0.5px solid rgba(212,168,67,0.4)",
+          marginBottom: 28,
+          boxShadow: "0 0 60px rgba(212,168,67,0.08)",
+          animation: "sealIn 0.6s ease both",
+        }}>
+          <img src={nftImage} alt="Your Pantheon XI NFT"
+            style={{ width: "100%", display: "block" }} />
+        </div>
+      )}
+
+      {/* Actions */}
+      <div style={{ width: "100%", maxWidth: 320, display: "flex", flexDirection: "column", gap: 10 }}>
+        <button
+          onClick={handleDownload}
+          style={{
+            background: "rgba(212,168,67,0.12)",
+            border: "0.5px solid rgba(212,168,67,0.55)",
+            color: "#D4A843",
+            fontFamily: "'Cormorant Garamond',Georgia,serif",
+            letterSpacing: "0.2em", fontSize: 12,
+            padding: "13px 24px", cursor: "pointer",
+            borderRadius: 2, textTransform: "uppercase",
+            width: "100%",
+          }}>
+          Download NFT
+        </button>
+        <a href={explorerUrl} target="_blank" rel="noopener noreferrer"
+          style={{
+            display: "block", textAlign: "center",
+            background: "transparent",
+            border: "0.5px solid rgba(245,237,216,0.15)",
+            color: "rgba(245,237,216,0.55)",
+            fontFamily: "'Crimson Text',Georgia,serif",
+            fontSize: 13, padding: "12px 24px",
+            borderRadius: 2, textDecoration: "none",
+          }}>
+          View on OKLink →
+        </a>
+        <button onClick={onClose} style={{
+          background: "transparent", border: "none",
+          color: "rgba(245,237,216,0.25)",
+          fontFamily: "'Crimson Text',Georgia,serif",
+          fontSize: 12, cursor: "pointer", padding: "8px",
+        }}>
+          Continue
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function Pantheon() {
   const [phase, setPhase] = useState("intro");
   const [selected, setSelected] = useState([]);
@@ -177,6 +275,7 @@ export default function Pantheon() {
   const [minted, setMinted] = useState(false);
   const [mintedTokenId, setMintedTokenId] = useState(null);
   const [nftImage, setNftImage] = useState(null);
+  const [showMintModal, setShowMintModal] = useState(false);
   const [wallet, setWallet] = useState(null);
   const [mintError, setMintError] = useState(null);
   const [unlockStatus, setUnlockStatus] = useState(null); // null | "checking" | "none" | "unrevealed" | "granted"
@@ -288,8 +387,7 @@ export default function Pantheon() {
       setNftImage(finalImage);
       setMintedTokenId(tokenId);
       setMinted(true);
-      setMinted(true);
-      setShowMintModal(true);  // add this
+      setShowMintModal(true);
     } catch (e) {
       setMintError(e.message);
     }
@@ -482,6 +580,15 @@ export default function Pantheon() {
         </div>
       )}
     </div>
+  );
+
+  // ── MINT SUCCESS MODAL ────────────────────────────────────────────────
+  if (showMintModal) return (
+    <MintSuccessModal
+      tokenId={mintedTokenId}
+      nftImage={nftImage}
+      onClose={() => setShowMintModal(false)}
+    />
   );
 
   // ── CONSENSUS ──────────────────────────────────────────────────────────
