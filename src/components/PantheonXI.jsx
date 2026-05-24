@@ -135,7 +135,7 @@ function VideoBackground() {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden" }}>
       <video autoPlay muted loop playsInline preload="auto"
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.18 }}>
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.35 }}>
         <source src="/videos/stadium.mp4" type="video/mp4" />
       </video>
       <div style={{ position: "absolute", inset: 0, background: "rgba(8,8,12,0.82)" }} />
