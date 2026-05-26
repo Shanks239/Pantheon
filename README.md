@@ -3,6 +3,7 @@
 > Summon football legends as AI agents. Argue with them. When consensus is reached, mint the verdict as an NFT on X Layer. Hold it to unlock the council's reaction after the 2026 final whistle.
 
 **Live:** https://pantheon-ebon.vercel.app  
+**Demo:** [Watch on X](https://x.com/PantheonXI/status/2059319568540004753)  
 **X:** [@PantheonXI](https://twitter.com/PantheonXI)  
 **Contract:** [0x7D7D338BAb8e19bad2c0959f15fe5d7ad6737708](https://www.oklink.com/x-layer-testnet/address/0x7D7D338BAb8e19bad2c0959f15fe5d7ad6737708)  
 **Built for:** [OKX X Cup Hackathon](https://web3.okx.com/xlayer/build-x-hackathon/xcup) · X Layer · May 2026
